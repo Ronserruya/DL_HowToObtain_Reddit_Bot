@@ -30,10 +30,10 @@ def getHTML(URL):
 
 def getFinalOutup(howToGet):
     # pandoc html to markdown didnt work on cases where there were multiple lines in a cell
-    tableString = str(howToGet).replace('<ul>','').replace('</ul>','').replace('<li>','').replace('</li>','')
+    tableString = str(howToGet).replace('<ul>','').replace('</ul>','').\
+        replace('<li>','%| | ').replace('</li>','|').replace('<br/>','')
     output = pypandoc.convert_text(tableString, 'markdown_phpextra', format='html')
-    # TODO: Handle mutliple lines in a cell, need to add '\n ||'
-    FinalOuttup = output.replace('/c', 'http://duellinks.gamea.co/c')
+    FinalOuttup = output.replace('/c', 'http://duellinks.gamea.co/c').replace('%','\n')
     return FinalOuttup
 
 def tableFromHeader(header):
