@@ -27,7 +27,7 @@ def getRelevantComments(r,lastReply):
 
     print "Obtaining last 20 comments..."
     # Go over the last 20 comments
-    for comment in r.subreddit('Duel Links').comments(limit=20):
+    for comment in r.subreddit('DuelLinks').comments(limit=20):
         if comment.created_utc > lastReply and \
                         comment.author.name != 'YugiohLinkBot' and comment.author.name != config.username:
             relevantComments.append(comment)
@@ -36,9 +36,9 @@ def getRelevantComments(r,lastReply):
 
 def replyToComment(comment,msg):
     commentFormat = '\n\n ______________________________________ \n\n' \
-                    'I AM A BOT, use {cardname} to call me.  \n ' \
+                    '^(I AM A BOT, use {cardname} or {{cardname}} to call me.  \n ' \
                     'The info for this comment was extracted from: ' \
-                    'duellinks.gamea.co , I don\'t have any relation to that site.  \n' \
+                    'duellinks.gamea.co , I don\'t have any relation to that site.)    \n' \
                     '[Source Code](https://github.com/Ronserruya/DL_HowToObtain_Reddit_Bot) '
     comment.reply(msg + commentFormat)
     return comment.created_utc
@@ -91,7 +91,7 @@ def run_bot(r,lastReply):
 
     for comment in relevantComments:
         try:
-            cardName = re.search('(?<=\{)(.*?)(?=\})',comment.body).group(0)
+            cardName = re.search('(?<=\{)(.*?)(?=\})',comment.body).group(0).replace('{','').replace('}','')
         except Exception as e:
             continue
 
