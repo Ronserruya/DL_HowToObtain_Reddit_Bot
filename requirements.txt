@@ -1,0 +1,4 @@
+praw==5.2.0
+html5lib==1.0.1
+pypandoc==1.4
+beautifulsoup4==4.6.0

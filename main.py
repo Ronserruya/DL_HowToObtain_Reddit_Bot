@@ -27,7 +27,7 @@ def getRelevantComments(r,lastReply):
 
     print "Obtaining last 20 comments..."
     # Go over the last 20 comments
-    for comment in r.subreddit('DuelLinks').comments(limit=20):
+    for comment in r.subreddit('Duel Links').comments(limit=20):
         if comment.created_utc > lastReply and \
                         comment.author.name != 'YugiohLinkBot' and comment.author.name != config.username:
             relevantComments.append(comment)
