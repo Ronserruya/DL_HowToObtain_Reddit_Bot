@@ -2,7 +2,11 @@
 
 Reddit bot that web scrapes "http://duellinks.gamea.co/" and tells the user how to get a specific card in the video game "Yugioh - Duel Links"
 
-### Prerequisites
+## Usage
+
+On the subbreddit [/r/DuelLinks](https://www.reddit.com/r/DuelLinks/), comment any card name between two curled braces, and the bot will answer. (Example in screenshots)
+
+## Prerequisites
 
 Developed on Python 2.7.12
 
@@ -11,6 +15,7 @@ Use this to install them
 ```
 pip install -r requirments.txt  
 ```  
+In addition to these python packeges, [Pandoc](http://pandoc.org/installing.html) is also needed
 
 ## Built With
 

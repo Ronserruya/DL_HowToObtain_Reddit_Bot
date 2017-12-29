@@ -21,11 +21,10 @@ def bot_login():
     return r
 
 def getRelevantComments(r,lastReply):
-    # Get comments in </r/DuelLinks> that has any string between " {} "
-    # eg. bla bla bla {Blast held by a tribute}
+    # Get comments in </r/DuelLinks> that are not from me or from YugiohLinkBot , since he comments with {*} as well
     relevantComments = []
 
-    print "Obtaining last 20 comments..."
+    #print "Obtaining last 20 comments..."
     # Go over the last 20 comments
     for comment in r.subreddit('DuelLinks').comments(limit=20):
         if comment.created_utc > lastReply and \
@@ -34,12 +33,13 @@ def getRelevantComments(r,lastReply):
 
     return relevantComments
 
-def replyToComment(comment,msg):
+def replyToComment(comment,msg,url = 'duellinks.gamea.co'):
     commentFormat = '\n\n ______________________________________ \n\n' \
                     '^(I AM A BOT, use {cardname} or {{cardname}} to call me.  \n ' \
-                    'The info for this comment was extracted from: ' \
-                    'duellinks.gamea.co , I don\'t have any relation to that site.)    \n' \
-                    '[Source Code](https://github.com/Ronserruya/DL_HowToObtain_Reddit_Bot) '
+                    'The info for this comment was extracted from: ' +  \
+                    url +' , I don\'t have any relation to that site.)    \n' \
+                    '[Source Code](https://github.com/Ronserruya/DL_HowToObtain_Reddit_Bot)  \n\n' \
+                    '[Strawpoll about his bot](http://www.strawpoll.me/14720346)'
     comment.reply(msg + commentFormat)
     return comment.created_utc
 
@@ -86,10 +86,11 @@ def tableFromHeader(header):
 def run_bot(r,lastReply):
     relevantComments = getRelevantComments(r,lastReply)
     if len(relevantComments) == 0:
-        print 'No relevant comments'
+        #print 'No relevant comments'
         return lastReply
 
     for comment in relevantComments:
+        #Get any string between {} , e.g {Time Wizard}, continue to next comment if not found
         try:
             cardName = re.search('(?<=\{)(.*?)(?=\})',comment.body).group(0).replace('{','').replace('}','')
         except Exception as e:
@@ -105,17 +106,17 @@ def run_bot(r,lastReply):
         howToHeader = getHowToHeader(page_soup)
         if howToHeader == False:
             lastReply = replyToComment(comment,'Sorry, I was not able to find the How To get Info,'
-                                   ' but this is the link to the card\'s page: {}'.format(URL))
+                                   ' but this is the link to the card\'s page: {}'.format(URL),URL)
             continue
 
         howToGet = tableFromHeader(howToHeader)
         FinalOutput = getFinalOutup(howToGet)
         if 'under construction.' in FinalOutput.lower():
             lastReply = replyToComment(comment, 'Sorry, I was not able to find the How To get Info,'
-                                                ' but this is the link to the card\'s page: {}'.format(URL))
+                                                ' but this is the link to the card\'s page: {}'.format(URL),URL)
             continue
 
-        lastReply = replyToComment(comment,FinalOutput)
+        lastReply = replyToComment(comment,FinalOutput,URL)
 
     return lastReply
 
@@ -130,7 +131,7 @@ def main():
     while True:
         # startTime gets the time of the last comment I replied to
         startTime = run_bot(r,startTime)
-        print "Waiting for 30 seconds"
+        #print "Waiting for 30 seconds"
         time.sleep(30)
 
 
