@@ -102,27 +102,32 @@ def run_bot(r,startTime):
         except Exception as e:
             continue
 
-        URL = getPageURL(cardName)
-        if URL == False:
-            replyToComment(comment,'Sorry, but I was not able to find this card')
-            continue
+        try:
+            URL = getPageURL(cardName)
+            if URL == False:
+                replyToComment(comment, 'Sorry, but I was not able to find this card')
+                continue
 
-        page_html = getHTML(URL)
-        page_soup = soup(page_html, 'html5lib')
-        howToHeader = getHowToHeader(page_soup)
-        if howToHeader == False:
-            replyToComment(comment,'Sorry, I was not able to find the How To get Info,'
-                                   ' but this is the link to the card\'s page: {}'.format(URL),URL)
-            continue
+            page_html = getHTML(URL)
+            page_soup = soup(page_html, 'html5lib')
+            howToHeader = getHowToHeader(page_soup)
+            if howToHeader == False:
+                replyToComment(comment, 'Sorry, I was not able to find the How To get Info,'
+                                        ' but this is the link to the card\'s page: {}'.format(URL), URL)
+                continue
 
-        howToGet = tableFromHeader(howToHeader)
-        FinalOutput = getFinalOutup(howToGet)
-        if 'under construction.' in FinalOutput.lower():
-            replyToComment(comment, 'Sorry, I was not able to find the How To get Info,'
-                                                ' but this is the link to the card\'s page: {}'.format(URL),URL)
-            continue
+            howToGet = tableFromHeader(howToHeader)
+            FinalOutput = getFinalOutup(howToGet)
+            if 'under construction.' in FinalOutput.lower():
+                replyToComment(comment, 'Sorry, I was not able to find the How To get Info,'
+                                        ' but this is the link to the card\'s page: {}'.format(URL), URL)
+                continue
 
-        replyToComment(comment,FinalOutput,URL)
+            replyToComment(comment, FinalOutput, URL)
+        except Exception as e:
+            replyToComment(comment,'Sorry, but I encountered an error :(')
+            print cardName
+            print e.message
 
     return startTime
 
