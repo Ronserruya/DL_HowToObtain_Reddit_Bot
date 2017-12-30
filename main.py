@@ -52,17 +52,21 @@ def getHowToHeader(pagesoup):
     return False
 
 def getPageURL(cardName):
-    #Search the card name on google,and return its gameA link
+    #Search the card name on google,and return its gamea link
     time.sleep(5)
     search_results = google.search('Duel Links GameA {} | Deck and Rulings |'.format(cardName))
     for result in search_results:
-        #If someone inputs "Blue eyes", I want it to still find "Blue-Eyes"
-        if cardName.lower().replace('-',' ') == result.name.lower().replace('-',' ').split(' | D')[0]:
+        #Try to fix misspelling
+        print cardName.lower().replace('-',' ').replace(',','').replace('\'','').replace(':','')
+        print result.name.lower().replace('-',' ').replace(',','').replace('\'','').replace(':','').split(' | d')[0]
+        if cardName.lower().replace('-',' ').replace(',','').replace('\'','').replace(':','') == \
+                result.name.lower().replace('-',' ').replace(',','').replace('\'','').replace(':','').split(' | d')[0]:
             return result.link
 
     search_results = google.search('Duel Links GameA {} | Deck and Tips |'.format(cardName))
     for result in search_results:
-        if cardName.lower().replace('-', ' ') == result.name.lower().replace('-', ' ').split(' | D')[0]:
+        if cardName.lower().replace('-', ' ').replace(',','').replace('\'','') == \
+                result.name.lower().replace('-', ' ').replace(',','').replace('\'','').split(' | D')[0]:
             return result.link
     return False
 
