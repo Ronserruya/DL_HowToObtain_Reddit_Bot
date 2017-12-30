@@ -57,13 +57,12 @@ def getPageURL(cardName):
     search_results = google.search('Duel Links GameA {} | Deck and Rulings |'.format(cardName))
     for result in search_results:
         #If someone inputs "Blue eyes", I want it to still find "Blue-Eyes"
-        if cardName.lower().replace('-',' ') == result.name.lower().replace('-',' ').split(' |')[0]:
+        if cardName.lower().replace('-',' ') == result.name.lower().replace('-',' ').split(' | D')[0]:
             return result.link
 
     search_results = google.search('Duel Links GameA {} | Deck and Tips |'.format(cardName))
     for result in search_results:
-        # If someone inputs "Blue eyes", I want it to still find "Blue-Eyes"
-        if cardName.lower().replace('-', ' ') == result.name.lower().replace('-', ' ').split(' |')[0]:
+        if cardName.lower().replace('-', ' ') == result.name.lower().replace('-', ' ').split(' | D')[0]:
             return result.link
     return False
 
