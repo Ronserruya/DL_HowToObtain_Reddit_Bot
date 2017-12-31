@@ -57,8 +57,6 @@ def getPageURL(cardName):
     search_results = google.search('Duel Links GameA {} | Deck and Rulings |'.format(cardName))
     for result in search_results:
         #Try to fix misspelling
-        print cardName.lower().replace('-',' ').replace(',','').replace('\'','').replace(':','')
-        print result.name.lower().replace('-',' ').replace(',','').replace('\'','').replace(':','').split(' | d')[0]
         if cardName.lower().replace('-',' ').replace(',','').replace('\'','').replace(':','') == \
                 result.name.lower().replace('-',' ').replace(',','').replace('\'','').replace(':','').split(' | d')[0]:
             return result.link
