@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup as soup
-from urllib2 import urlopen as uReq
+from urllib2 import urlopen
 from google import google
 import html5lib
 import pypandoc
@@ -70,7 +70,7 @@ def getPageURL(cardName):
 
 def getHTML(URL):
     #Get the HTML of the gameA page
-    uClient = uReq(URL)
+    uClient = urlopen(URL)
     page_html = uClient.read()
     uClient.close()
     return page_html
@@ -88,6 +88,13 @@ def tableFromHeader(header):
     #Navigate from "How to get" header to the following table
     table = header.parent.nextSibling.contents[1].contents[0]
     return table
+
+def reportError(r,comment,cardname,message):
+    errorMsg = '{} Error report:  \n\n' \
+               'Comment: {}  \n\n' \
+               'Cardname: {}  \n\n' \
+               'Error: {}'.format(config.username,comment.permalink,cardname,message)
+    r.redditor(config.developer).message('{} Error report'.format(config.username),errorMsg)
 
 def run_bot(r,startTime):
     relevantComments,startTime = getRelevantComments(r,startTime)
@@ -126,9 +133,7 @@ def run_bot(r,startTime):
 
             replyToComment(comment, FinalOutput, URL)
         except Exception as e:
-            replyToComment(comment,'Sorry, but I encountered an error :(')
-            print cardName
-            print e.message
+            reportError(r,comment,cardName,e.message)
 
     return startTime
 
