@@ -7,6 +7,7 @@ import time
 import praw
 import config
 import re
+import string
 
 def bot_login():
     # Login with praw
@@ -33,11 +34,11 @@ def getRelevantComments(r,startTime):
 
     return relevantComments,time.time()
 
-def replyToComment(comment,msg,url = 'duellinks.gamea.co'):
+def replyToComment(comment,msg,url = 'duellinks.gamea.co ,'):
     commentFormat = '\n\n ______________________________________ \n\n' \
                     '^(I AM A BOT, use {cardname} or {{cardname}} to call me.  \n ' \
                     'The info for this comment was extracted from: ' +  \
-                    url +' , I don\'t have any relation to that site.)    \n' \
+                    url +'I don\'t have any relation to that site.)    \n' \
                     '[Source Code](https://github.com/Ronserruya/DL_HowToObtain_Reddit_Bot)  \n\n' \
                     '[Strawpoll about this bot](http://www.strawpoll.me/14720346)'
     comment.reply(msg + commentFormat)
@@ -52,16 +53,25 @@ def getHowToHeader(pagesoup):
     return False
 
 def getPageURL(cardName):
-    #Search the card name on google,and return its gamea link
+    # Search the card name on google,and return its gamea link
+    # Example title: Dark Magician | Deck and Rulings | YuGiOh! Duel Links - GameA
+    # Sleep to prevent google blocking
     time.sleep(5)
     search_results = google.search('Duel Links GameA {} | Deck and Rulings |'.format(cardName))
+    if search_results == None: # If google blocked the request
+        return 'CAPTCHA'
+
     for result in search_results:
         #Try to fix misspelling
         if cardName.lower().replace('-',' ').replace(',','').replace('\'','').replace(':','') == \
                 result.name.lower().replace('-',' ').replace(',','').replace('\'','').replace(':','').split(' | d')[0]:
             return result.link
 
+    time.sleep(5)
     search_results = google.search('Duel Links GameA {} | Deck and Tips |'.format(cardName))
+    if search_results == None: # If google blocked the request
+        return 'CAPTCHA'
+
     for result in search_results:
         if cardName.lower().replace('-', ' ').replace(',','').replace('\'','') == \
                 result.name.lower().replace('-', ' ').replace(',','').replace('\'','').split(' | D')[0]:
@@ -104,41 +114,59 @@ def run_bot(r,startTime):
 
     for comment in relevantComments:
         #Get any string between {} , e.g {Time Wizard}, continue to next comment if not found
-        # TODO: Support multiple cards in a comment
-        try:
-            cardName = re.search('(?<=\{)(.*?)(?=\})',comment.body).group(0).replace('{','').replace('}','')
-        except Exception as e:
-            continue
 
-        try:
-            URL = getPageURL(cardName)
-            if URL == False:
-                replyToComment(comment, 'Sorry, but I was not able to find this card')
-                continue
+        cards = re.findall('(?<=\{)(.*?)(?=\})',comment.body)
+        commentOutput = ''
+        urlOutput = ''
+        for cardName in cards:
+            cardName = cardName.replace('{','').replace('}','')
 
-            page_html = getHTML(URL)
-            page_soup = soup(page_html, 'html5lib')
-            howToHeader = getHowToHeader(page_soup)
-            if howToHeader == False:
-                replyToComment(comment, 'Sorry, I was not able to find the How To get Info,'
-                                        ' but this is the link to the card\'s page: {}'.format(URL), URL)
-                continue
+            try:
+                URL = '          ' #Reset URL value, so it wont remove the first card in a case of an error
+                commentOutput += '**'+string.capwords(cardName) + ':**  \n\n'
+                if cardName == 'fail':
+                    a = 5/0
+                URL = getPageURL(cardName)
+                if URL == 'CAPTCHA':
+                    reportError(r,comment,cardName,'Got CAPTCHA')
+                    time.sleep(900) #Sleep for 15 mins, for google captcha to disappear
+                    return time.time() #return the excpected startTime
+                if URL == False:
+                    commentOutput += 'Sorry, but I was not able to find this card.  \n'
+                    continue
+                urlOutput += URL + ' ,'
 
-            howToGet = tableFromHeader(howToHeader)
-            FinalOutput = getFinalOutup(howToGet)
-            if 'under construction.' in FinalOutput.lower():
-                replyToComment(comment, 'Sorry, I was not able to find the How To get Info,'
-                                        ' but this is the link to the card\'s page: {}'.format(URL), URL)
-                continue
+                page_html = getHTML(URL)
+                page_soup = soup(page_html, 'html5lib')
+                howToHeader = getHowToHeader(page_soup)
+                if howToHeader == False:
+                    commentOutput += 'Sorry, I was not able to find the How To get Info,' \
+                                     ' but this is the link to the card\'s page: {}  \n'.format(URL)
+                    continue
 
-            replyToComment(comment, FinalOutput, URL)
-        except Exception as e:
-            reportError(r,comment,cardName,e.message)
+                howToGet = tableFromHeader(howToHeader)
+                FinalOutput = getFinalOutup(howToGet)
+                if 'under construction.' in FinalOutput.lower():
+                    commentOutput += 'Sorry, I was not able to find the How To get Info,' \
+                                     ' but this is the link to the card\'s page: {}  \n'.format(URL)
+                    continue
+
+                commentOutput += FinalOutput + '  \n'
+            except Exception as e:
+                reportError(r, comment, cardName, e.message)
+                commentOutput = commentOutput.replace('**'+string.capwords(cardName) + ':**  \n\n','')
+                urlOutput = urlOutput.replace(URL + ' ,','')
+
+        if commentOutput != '': # If there is anything to comment
+            if urlOutput == '': # If you have no URL to show
+                replyToComment(comment, commentOutput)
+            else: # If you have a URL to show
+                replyToComment(comment,commentOutput,urlOutput)
+
+
 
     return startTime
 
-
-    return True
 
 
 def main():
