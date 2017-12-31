@@ -57,7 +57,7 @@ def getPageURL(cardName):
     # Example title: Dark Magician | Deck and Rulings | YuGiOh! Duel Links - GameA
     # Sleep to prevent google blocking
     time.sleep(5)
-    search_results = google.search('Duel Links GameA {} | Deck and Rulings |'.format(cardName))
+    search_results = google.search('{} | Deck and Rulings | YuGiOh! Duel Links - GameA'.format(cardName))
     if search_results == None: # If google blocked the request
         return 'CAPTCHA'
 
@@ -68,7 +68,7 @@ def getPageURL(cardName):
             return result.link
 
     time.sleep(5)
-    search_results = google.search('Duel Links GameA {} | Deck and Tips |'.format(cardName))
+    search_results = google.search('{} | Deck and Tips | YuGiOh! Duel Links - GameA'.format(cardName))
     if search_results == None: # If google blocked the request
         return 'CAPTCHA'
 
@@ -132,7 +132,8 @@ def run_bot(r,startTime):
                     time.sleep(900) #Sleep for 15 mins, for google captcha to disappear
                     return time.time() #return the excpected startTime
                 if URL == False:
-                    commentOutput += 'Sorry, but I was not able to find this card.  \n'
+                    commentOutput = commentOutput.replace('**' + string.capwords(cardName) + ':**  \n\n', '')
+                    #commentOutput += 'Sorry, but I was not able to find this card.  \n'
                     continue
                 urlOutput += URL + ' ,'
 
