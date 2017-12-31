@@ -141,15 +141,19 @@ def run_bot(r,startTime):
                 page_soup = soup(page_html, 'html5lib')
                 howToHeader = getHowToHeader(page_soup)
                 if howToHeader == False:
-                    commentOutput += 'Sorry, I was not able to find the How To get Info,' \
-                                     ' but this is the link to the card\'s page: {}  \n'.format(URL)
+                    # commentOutput += 'Sorry, I was not able to find the How To get Info,' \
+                    #                  ' but this is the link to the card\'s page: {}  \n'.format(URL)
+                    commentOutput = commentOutput.replace('**' + string.capwords(cardName) + ':**  \n\n', '')
+                    urlOutput = urlOutput.replace(URL + ' ,', '')
                     continue
 
                 howToGet = tableFromHeader(howToHeader)
                 FinalOutput = getFinalOutup(howToGet)
                 if 'under construction.' in FinalOutput.lower():
-                    commentOutput += 'Sorry, I was not able to find the How To get Info,' \
-                                     ' but this is the link to the card\'s page: {}  \n'.format(URL)
+                    # commentOutput += 'Sorry, I was not able to find the How To get Info,' \
+                    #                  ' but this is the link to the card\'s page: {}  \n'.format(URL)
+                    commentOutput = commentOutput.replace('**' + string.capwords(cardName) + ':**  \n\n', '')
+                    urlOutput = urlOutput.replace(URL + ' ,', '')
                     continue
 
                 commentOutput += FinalOutput + '  \n'
