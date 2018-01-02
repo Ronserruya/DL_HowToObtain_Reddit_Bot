@@ -74,7 +74,7 @@ def getPageURL(cardName):
 
     for result in search_results:
         if cardName.lower().replace('-', ' ').replace(',','').replace('\'','') == \
-                result.name.lower().replace('-', ' ').replace(',','').replace('\'','').split(' | D')[0]:
+                result.name.lower().replace('-', ' ').replace(',','').replace('\'','').split(' | d')[0]:
             return result.link
     return False
 
@@ -91,7 +91,8 @@ def getFinalOutup(howToGet):
         replace('<li>','%| | ').replace('</li>','|').replace('<br/>','')
     #Markdown_phpextra is similar to reddit's formatting
     output = pypandoc.convert_text(tableString, 'markdown_phpextra', format='html')
-    FinalOuttup = output.replace('/c', 'http://duellinks.gamea.co/c').replace('%','\n')
+    FinalOuttup = output.replace('/c', 'http://duellinks.gamea.co/c').replace('%','\n')\
+        .replace('30','10') #30->10 for LD drops
     return FinalOuttup
 
 def tableFromHeader(header):
@@ -163,10 +164,7 @@ def run_bot(r,startTime):
                 urlOutput = urlOutput.replace(URL + ' ,','')
 
         if commentOutput != '': # If there is anything to comment
-            if urlOutput == '': # If you have no URL to show
-                replyToComment(comment, commentOutput)
-            else: # If you have a URL to show
-                replyToComment(comment,commentOutput,urlOutput)
+            replyToComment(comment,commentOutput,urlOutput)
 
 
 
