@@ -39,8 +39,7 @@ def replyToComment(comment,msg,url = 'duellinks.gamea.co ,'):
                     '^(I AM A BOT, use {cardname} or {{cardname}} to call me.  \n ' \
                     'The info for this comment was extracted from: ' +  \
                     url +'I don\'t have any relation to that site.)    \n' \
-                    '[Source Code](https://github.com/Ronserruya/DL_HowToObtain_Reddit_Bot)  \n\n' \
-                    '[Strawpoll about this bot](http://www.strawpoll.me/14720346)'
+                    '[Source Code](https://github.com/Ronserruya/DL_HowToObtain_Reddit_Bot)'
     comment.reply(msg + commentFormat)
 
 def getHowToHeader(pagesoup):
