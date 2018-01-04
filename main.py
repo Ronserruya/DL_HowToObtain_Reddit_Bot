@@ -28,9 +28,12 @@ def getRelevantComments(r,startTime):
     #print "Obtaining last 20 comments..."
     # Go over the last 20 comments
     for comment in r.subreddit('DuelLinks').comments(limit=20):
-        if comment.created_utc > startTime and \
-                        comment.author.name != 'YugiohLinkBot' and comment.author.name != config.username:
-            relevantComments.append(comment)
+        try:
+            if comment.created_utc > startTime and \
+                            comment.author.name != 'YugiohLinkBot' and comment.author.name != config.username:
+                relevantComments.append(comment)
+        except Exception as e:
+            pass  # comment probably deleted
 
     return relevantComments,time.time()
 
@@ -40,7 +43,10 @@ def replyToComment(comment,msg,url = 'duellinks.gamea.co ,'):
                     'The info for this comment was extracted from: ' +  \
                     url +'I don\'t have any relation to that site.)    \n' \
                     '[Source Code](https://github.com/Ronserruya/DL_HowToObtain_Reddit_Bot)'
-    comment.reply(msg + commentFormat)
+    try:
+        comment.reply(msg + commentFormat)
+    except Exception as e:
+        pass  # comment probably deleted
 
 def getHowToHeader(pagesoup):
     # Get all headers in the page
@@ -114,8 +120,11 @@ def run_bot(r,startTime):
 
     for comment in relevantComments:
         #Get any string between {} , e.g {Time Wizard}, continue to next comment if not found
+        try:
+            cards = re.findall('(?<=\{)(.*?)(?=\})',comment.body)
+        except Exception as e:
+            continue  # comment probably deleted
 
-        cards = re.findall('(?<=\{)(.*?)(?=\})',comment.body)
         commentOutput = ''
         urlOutput = ''
         for cardName in cards:
